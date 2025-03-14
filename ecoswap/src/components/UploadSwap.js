@@ -26,6 +26,7 @@ const theme = {
 const UploadSwap = forwardRef((props, ref) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [swapDescription, setSwapDescription] = useState("");
+  const [swapTitle, setSwapTitle] = useState("");
   const [images, setImages] = useState([]);
   const [desiredItem, setDesiredItem] = useState("");
   const [error, setError] = useState(null);
@@ -72,6 +73,10 @@ const UploadSwap = forwardRef((props, ref) => {
   };
 
   const handleSubmit = () => {
+    if (!swapTitle.trim()) {
+      setError("Swap Title is required.");
+      return;
+    }
     if (!swapDescription.trim()) {
       setError("Swap description is required.");
       return;
@@ -87,6 +92,7 @@ const UploadSwap = forwardRef((props, ref) => {
     setError("Swap uploaded successfully!");
     setTimeout(() => {
       setModalVisible(false);
+      setSwapTitle("");
       setSwapDescription("");
       setImages([]);
       setDesiredItem("");
@@ -112,6 +118,15 @@ const UploadSwap = forwardRef((props, ref) => {
             </TouchableOpacity>
             <ScrollView>
               <Text style={[styles.modalTitle, { color: theme.text }]}>Upload Swap</Text>
+
+              <Input
+                label="Swap Title"
+                value={swapTitle}
+                onChangeText={setSwapTitle}
+                placeholder="Title of your item"
+                style={{ borderColor: theme.border }}
+              />
+
               <Input
                 label="Swap Description"
                 value={swapDescription}

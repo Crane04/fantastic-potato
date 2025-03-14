@@ -1,12 +1,14 @@
+// src/screens/SignUp.js
 import React, { useState } from "react";
 import {
+  StyleSheet,
   View,
-  ActivityIndicator,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
-  StyleSheet,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Text from "../components/Text";
@@ -14,46 +16,71 @@ import Button from "../components/Button";
 import Container from "../components/Container";
 import Input from "../components/Input";
 import postRequest from "../api/postRequest";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Define theme outside the component (consistent with other screens)
+const theme = {
+  background: "#E6F0FA",
+  text: "#1E1B4B",
+  accent: "#280967",
+  secondary: "#BFDBFE",
+  border: "#1E3A8A",
+  error: "#EF4444",
+};
 
 const SignUpScreen = ({ navigation }) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [name, setName] = useState(""); 
+  const [phone, setPhone] = useState(""); 
   const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [country, setCountry] = useState("");
   const [password, setPassword] = useState("");
   const [cPassword, setCPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [error, setError] = useState(null); // Added for custom error messages
+  const [error, setError] = useState(null);
 
-  const theme = {
-    light: {
-      background: "#E6F0FA", // Light blue-gray
-      text: "#1E1B4B", // Darker blue for better contrast
-      accent: "#280967", // Deep blue
-      secondary: "#BFDBFE", // Light blue for inputs
-      error: "#EF4444", // Red for errors
-      border: "#1E3A8A", // Dark blue for input borders
-    },
-    dark: {
-      background: "#1E1B4B", // Very dark blue
-      text: "#DBEAFE", // Light blue-gray
-      accent: "#3B82F6", // Brighter blue for dark mode
-      secondary: "#4B5EAA", // Medium-dark blue for inputs
-      error: "#F87171", // Lighter red for dark mode
-      border: "#BFDBFE", // Light blue for input borders
-    },
+  // Email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Reset form fields
+  const resetForm = () => {
+    setName("");
+    setPhone("");
+    setEmail("");
+    setAddress("");
+    setCity("");
+    setState("");
+    setCountry("");
+    setPassword("");
+    setCPassword("");
   };
 
-  const currentTheme = isDarkMode ? theme.dark : theme.light;
-
   const handleSignUp = async () => {
-    // Reset error state
     setError(null);
 
     // Validation
-    if (!firstName || !lastName || !phoneNumber || !email || !password || !cPassword) {
+    if (
+      !name ||
+      !phone ||
+      !email ||
+      !address ||
+      !city ||
+      !state ||
+      !country ||
+      !password ||
+      !cPassword
+    ) {
       setError("Please fill in all fields");
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
       return;
     }
     if (password !== cPassword) {
@@ -64,94 +91,116 @@ const SignUpScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const response = await postRequest("/users/signup", {
-        firstName,
-        lastName,
-        phoneNumber,
+      const response = await postRequest("/api/auth/register", {
+        name, 
+        phone, 
         email,
+        address,
+        city,
+        state,
+        country,
         password,
       });
+
       if (response.status === 201) {
-        navigation.navigate("SignIn");
+        // Registration successful
+        resetForm();
+        // Show success message before redirecting
+        Alert.alert(
+          "Success",
+          "Registration successful! Please log in.",
+          [{ text: "OK", onPress: () => navigation.navigate("SignIn") }]
+        );
+      } else if (response.status === 422 || response.status === 400) {
+        setError(
+          response.data?.message || "Invalid registration data. Please check your inputs."
+        );
       } else {
-        setError("Failed to sign up. Please try again.");
+        setError("Registration failed. Please try again later.");
       }
     } catch (error) {
-      console.error(error);
-      setError("Error signing up. Please try again.");
+      console.error("Registration error:", error);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Container bg={currentTheme.background}>
+    <Container bg={theme.background}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          {/* Header with Icon and Toggle Button */}
+          {/* Header with Logo */}
           <View style={styles.headerContainer}>
             <View style={styles.logoContainer}>
-              <Icon name="leaf" size={40} color={currentTheme.accent} />
-              <Text style={[styles.header, { color: currentTheme.text }]}>
+              <Icon name="leaf" size={40} color={theme.accent} />
+              <Text style={[styles.header, { color: theme.text }]}>
                 EcoSwap
               </Text>
             </View>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                {
-                  backgroundColor: isDarkMode
-                    ? currentTheme.secondary
-                    : currentTheme.accent,
-                },
-              ]}
-              onPress={() => setIsDarkMode(!isDarkMode)}
-            >
-              <Icon
-                name={isDarkMode ? "weather-sunny" : "weather-night"}
-                size={20}
-                color={isDarkMode ? currentTheme.text : currentTheme.background}
-              />
-            </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={[styles.subHeader, { color: currentTheme.text }]}>
+            <Text style={[styles.subHeader, { color: theme.text }]}>
               Create An Account
             </Text>
 
             <Input
-              label="First Name"
-              placeholder="John"
-              value={firstName}
-              onChangeText={(text) => setFirstName(text)}
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              label="Full Name"
+              placeholder="Adekunle Blessing"
+              value={name}
+              onChangeText={(text) => setName(text)}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
-              label="Last Name"
-              placeholder="Doe"
-              value={lastName}
-              onChangeText={(text) => setLastName(text)}
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
-            />
-            <Input
-              label="Phone Number"
-              placeholder="090-123-456-78"
-              value={phoneNumber}
-              onChangeText={(text) => setPhoneNumber(text)}
+              label="Phone"
+              placeholder="09189900483"
+              value={phone}
+              onChangeText={(text) => setPhone(text)}
               keyboardType="number-pad"
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
               label="Email"
-              placeholder="johndoe@ecoswap.com"
+              placeholder="ola@gmail.com"
               value={email}
               onChangeText={(text) => setEmail(text)}
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
+            />
+            <Input
+              label="Address"
+              placeholder="1 Breakthrough Avenue, Sango Otta"
+              value={address}
+              onChangeText={(text) => setAddress(text)}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
+            />
+            <Input
+              label="City"
+              placeholder="Sango Otta"
+              value={city}
+              onChangeText={(text) => setCity(text)}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
+            />
+            <Input
+              label="State"
+              placeholder="Ogun State"
+              value={state}
+              onChangeText={(text) => setState(text)}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
+            />
+            <Input
+              label="Country"
+              placeholder="Nigeria"
+              value={country}
+              onChangeText={(text) => setCountry(text)}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
               label="Password"
@@ -159,8 +208,8 @@ const SignUpScreen = ({ navigation }) => {
               value={password}
               onChangeText={(text) => setPassword(text)}
               secureTextEntry
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
               label="Confirm Password"
@@ -168,33 +217,33 @@ const SignUpScreen = ({ navigation }) => {
               value={cPassword}
               onChangeText={(text) => setCPassword(text)}
               secureTextEntry
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
 
             {isLoading ? (
-              <ActivityIndicator size="large" color={currentTheme.accent} />
+              <ActivityIndicator size="large" color={theme.accent} />
             ) : (
               <Button
                 text="Sign Up"
                 onPress={handleSignUp}
-                style={[styles.signUpButton, { backgroundColor: currentTheme.accent }]}
+                style={[styles.signUpButton, { backgroundColor: theme.accent }]}
                 textStyle={styles.signUpButtonText}
               />
             )}
 
             {error && (
-              <Text style={[styles.error, { color: currentTheme.error }]}>
+              <Text style={[styles.error, { color: theme.error }]}>
                 {error}
               </Text>
             )}
 
             <View style={styles.bottom}>
-              <Text style={{ color: currentTheme.text }}>
+              <Text style={{ color: theme.text }}>
                 Already have an account?
               </Text>
               <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
-                <Text style={[styles.authText, { color: currentTheme.accent }]}>
+                <Text style={[styles.authText, { color: theme.accent }]}>
                   Login
                 </Text>
               </TouchableOpacity>
@@ -213,7 +262,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
@@ -226,12 +275,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
   },
-  toggleButton: {
-    padding: 8,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   subHeader: {
     fontSize: 24,
     fontWeight: "600",
@@ -239,17 +282,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   label: {
-    fontSize: 15,
-    marginBottom: 1,
-    fontWeight: "500", 
+    fontSize: 16,
+    marginBottom: 5,
+    fontWeight: "500",
   },
   input: {
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
     fontSize: 16,
-    borderWidth: 1.5, 
-    borderColor: "#000000", 
+    borderWidth: 1,
   },
   signUpButton: {
     paddingVertical: 10,

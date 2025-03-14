@@ -1,13 +1,12 @@
-// src/screens/SignIn.js
 import React, { useState } from "react";
 import {
-  View,
   StyleSheet,
+  View,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Text from "../components/Text";
@@ -15,37 +14,25 @@ import Button from "../components/Button";
 import Container from "../components/Container";
 import Input from "../components/Input";
 import postRequest from "../api/postRequest";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const theme = {
+  background: "#E6F0FA",
+  text: "#1E1B4B",
+  accent: "#280967",
+  secondary: "#BFDBFE",
+  border: "#1E3A8A",
+  error: "#EF4444",
+};
 
 const SignInScreen = ({ navigation }) => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const theme = {
-    light: {
-      background: "#E6F0FA", // Light blue-gray
-      text: "#1E1B4B", // Darker blue for better contrast (adjusted from #1E3A8A)
-      accent: "#280967", // Deep blue
-      secondary: "#BFDBFE", // Light blue for inputs
-      error: "#EF4444", // Red for errors
-      border: "#1E3A8A", // Dark blue for input borders
-    },
-    dark: {
-      background: "#1E1B4B", // Very dark blue
-      text: "#DBEAFE", // Light blue-gray
-      accent: "#3B82F6", // Brighter blue for dark mode
-      secondary: "#4B5EAA", // Medium-dark blue for inputs
-      error: "#F87171", // Lighter red for dark mode
-      border: "#BFDBFE", // Light blue for input borders
-    },
-  };
-
-  const currentTheme = isDarkMode ? theme.dark : theme.light;
 
   const handleSignIn = async () => {
-    setError(null); // Reset error state
+    setError(null);
     if (!identifier || !password) {
       setError("Please fill in all fields");
       return;
@@ -53,20 +40,25 @@ const SignInScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const response = await postRequest("/users/signin", {
+      const response = await postRequest("/api/auth/login", {
         identifier,
         password,
       });
 
       if (response.status === 200) {
-        await login(response.data.token); // Assuming 'login' is defined elsewhere
-        navigation.navigate("Tabs");
+        // Store token and navigate to Home
+        await AsyncStorage.setItem("userToken", response.data.token);
+        setIdentifier("");
+        setPassword("");
+        navigation.navigate("Home");
+      } else if (response.status === 401) {
+        setError(response.data?.message || "Invalid credentials");
       } else {
-        setError("Invalid Credentials");
+        setError("Login failed. Please try again later.");
       }
     } catch (error) {
-      console.error(error);
-      setError("Error logging in");
+      console.error("Login error:", error);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -79,78 +71,61 @@ const SignInScreen = ({ navigation }) => {
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
-      labelStyle={[styles.label, { color: currentTheme.text }]}
-      style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border, borderWidth: 1.5 }]}
+      labelStyle={[styles.label, { color: theme.text }]}
+      style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
     />
   );
 
   return (
-    <Container bg={currentTheme.background}>
+    <Container bg={theme.background}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          {/* Header with Icon and Toggle Button */}
+          {/* Header with Logo */}
           <View style={styles.headerContainer}>
             <View style={styles.logoContainer}>
-              <Icon name="leaf" size={40} color={currentTheme.accent} />
-              <Text style={[styles.header, { color: currentTheme.text }]}>
+              <Icon name="leaf" size={40} color={theme.accent} />
+              <Text style={[styles.header, { color: theme.text }]}>
                 EcoSwap
               </Text>
             </View>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                {
-                  backgroundColor: isDarkMode
-                    ? currentTheme.secondary
-                    : currentTheme.accent,
-                },
-              ]}
-              onPress={() => setIsDarkMode(!isDarkMode)}
-            >
-              <Icon
-                name={isDarkMode ? "weather-sunny" : "weather-night"}
-                size={20}
-                color={isDarkMode ? currentTheme.text : currentTheme.background}
-              />
-            </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={[styles.subHeader, { color: currentTheme.text }]}>
+            <Text style={[styles.subHeader, { color: theme.text }]}>
               Log In to Your Account
             </Text>
 
             {renderInput(
-              "Matric Number or Email",
-              "220221XYZ",
+              "Email",
+              "johndoe@ecoswap.com",
               identifier,
               setIdentifier
             )}
             {renderInput("Password", "*******", password, setPassword, true)}
 
             {isLoading ? (
-              <ActivityIndicator size="large" color={currentTheme.accent} />
+              <ActivityIndicator size="large" color={theme.accent} />
             ) : (
               <Button
                 text="Log In"
                 onPress={handleSignIn}
-                style={[styles.signInButton, { backgroundColor: currentTheme.accent }]}
+                style={[styles.signInButton, { backgroundColor: theme.accent }]}
                 textStyle={styles.signInButtonText}
               />
             )}
 
             {error && (
-              <Text style={[styles.error, { color: currentTheme.error }]}>
+              <Text style={[styles.error, { color: theme.error }]}>
                 {error}
               </Text>
             )}
 
             <View style={styles.bottom}>
-              <Text style={{ color: currentTheme.text }}>
+              <Text style={{ color: theme.text }}>
                 Don’t have an account yet?
               </Text>
               <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-                <Text style={[styles.authText, { color: currentTheme.accent }]}>
+                <Text style={[styles.authText, { color: theme.accent }]}>
                   Sign Up
                 </Text>
               </TouchableOpacity>
@@ -169,7 +144,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
@@ -182,12 +157,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
   },
-  toggleButton: {
-    padding: 8,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   subHeader: {
     fontSize: 24,
     fontWeight: "600",
@@ -197,13 +166,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-    fontWeight: "500", 
+    fontWeight: "500",
   },
   input: {
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
     fontSize: 16,
+    borderWidth: 1,
   },
   signInButton: {
     paddingVertical: 10,

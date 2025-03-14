@@ -1,3 +1,2 @@
-// export const BACKEND_URL = "http://localhost:3000"; // For local development
-
-export const BACKEND_URL = "https://sprint-u3cf.onrender.com";
+// src/utilities/constants.j
+export const BACKEND_URL = "https://ecoswap-api-4.onrender.com";
