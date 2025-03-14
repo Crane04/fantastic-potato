@@ -17,7 +17,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import * as ImagePicker from "expo-image-picker";
 
 const UnitPost = ({ route, navigation }) => {
-  const { swapId } = route.params;
+  const { swapId, title } = route.params;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
@@ -100,7 +100,7 @@ const UnitPost = ({ route, navigation }) => {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <Text style={[styles.title, { color: currentTheme.text }]}>
-            Used Laptop
+            {title}
           </Text>
           <Text style={[styles.description, { color: currentTheme.text }]}>
             Good condition, seeking phone
@@ -119,7 +119,8 @@ const UnitPost = ({ route, navigation }) => {
               value={commentText}
               onChangeText={setCommentText}
               placeholder="Add a comment..."
-              style={{ flex: 1, borderColor: currentTheme.border }}
+              // style={{ flex: 1, height: 40, borderColor: currentTheme.border }}
+              Style={styles.msg}
             />
             <TouchableOpacity onPress={handleImagePicker} style={styles.imageButton}>
               <Icon name="image" size={24} color={currentTheme.accent} />
@@ -128,7 +129,7 @@ const UnitPost = ({ route, navigation }) => {
               text="Post"
               onPress={handleCommentSubmit}
               color={currentTheme.accent}
-              style={{ marginLeft: 10 }}
+              style={{ marginLeft: 10, width:69, top: 10,}}
             />
           </View>
         </KeyboardAvoidingView>
@@ -227,10 +228,17 @@ const styles = StyleSheet.create({
   commentInputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
+    width: 380,
+    gap:20,
   },
   imageButton: {
     padding: 10,
+    position: "relative",
+    top: 10,
+
+    backgroundColor: 100,
   },
   bottomNav: {
     flexDirection: "row",
@@ -248,6 +256,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
   },
+  msg: { 
+    padding: 10,
+    marginVertical: 25,
+    backgroundColor: "yellow",
+  }
 });
 
 export default UnitPost;

@@ -1,5 +1,5 @@
-// src/screens/EditProfile.js
-import React, { useState, useRef } from "react";
+// /profile/image-upload
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -16,9 +16,12 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import * as ImagePicker from "expo-image-picker";
 import UploadSwap from "../components/UploadSwap";
-import { Picker } from "@react-native-picker/picker"; // Updated import
+import { Picker } from "@react-native-picker/picker";
+import { useAuth } from "../contexts/AuthContext";
+import { BACKEND_URL } from "../utilities/constants";
+import axios from "axios";
+import ExpoFastImage from "expo-fast-image"
 
-// Define theme outside the component (consistent with Home.js, FundWallet.js, etc.)
 const theme = {
   background: "#E6F0FA",
   text: "#1E1B4B",
@@ -39,27 +42,61 @@ const countries = [
   "Japan",
   "Brazil",
   "South Africa",
-  // Add more countries as needed
 ];
 
 const EditProfile = ({ navigation }) => {
   const [FullName, setFullName] = useState("");
   // const [lastName, setLastName] = useState("");
-  const [email] = useState("john.doe@example.com"); // Read-only email
+  const [email] = useState("");
   const [streetAddress, setStreetAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("Nigeria"); // Default country
   const [profileImage, setProfileImage] = useState(null);
   const uploadSwapRef = useRef(null);
+  const { getUser, userData, jwt } = useAuth();
+
+  useEffect(() => {
+    console.log(userData?.image);
+  }, []);
 
   const handleImagePicker = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
-    if (!result.cancelled) {
-      setProfileImage(result.assets[0].uri);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const imageUri = result.assets[0].uri;
+
+        // Prepare image for upload
+        const formData = new FormData();
+        formData.append("image", {
+          uri: imageUri,
+          name: "profile.jpg", // You can change the file name
+          type: "image/jpeg", // Adjust based on image type
+        });
+
+        // Send POST request
+        const response = await axios.post(
+          `${BACKEND_URL}/profile/image-upload`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${jwt}`, // Assuming you have jwt stored
+            },
+          }
+        );
+
+        if (response.status == 200) {
+          Alert.alert("Success", "Image uploaded successfully!");
+        }
+      }
+    } catch (error) {
+      console.error("Image upload error:", error);
+      Alert.alert("Error", "Failed to upload image. Please try again.");
     }
   };
 
@@ -73,14 +110,15 @@ const EditProfile = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.container}>
         <Header navigation={navigation} />
         <View style={styles.content}>
-          <Text style={[styles.title, { color: theme.text }]}>Edit Profile</Text>
-          <TouchableOpacity onPress={handleImagePicker} style={styles.imagePicker}>
-            <Image
-              source={
-                profileImage
-                  ? { uri: profileImage }
-                  : { uri: "https://via.placeholder.com/100" }
-              }
+          <Text style={[styles.title, { color: theme.text }]}>
+            Edit Profile
+          </Text>
+          <TouchableOpacity
+            onPress={handleImagePicker}
+            style={styles.imagePicker}
+          >
+            <ExpoFastImage
+              source={{ uri: userData?.image }}
               style={styles.profileImage}
             />
             <Icon
@@ -108,7 +146,7 @@ const EditProfile = ({ navigation }) => {
             editable={false} // Read-only
             style={{
               borderColor: theme.accent,
-              backgroundColor: "#E5E7EB", 
+              backgroundColor: "#E5E7EB",
             }}
           />
           <Input

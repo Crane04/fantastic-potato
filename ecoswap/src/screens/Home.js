@@ -1,4 +1,3 @@
-// src/screens/Home.js
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   StyleSheet,
@@ -6,16 +5,17 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
-  Image,
+  StatusBar,
 } from "react-native";
 import Container from "../components/Container";
 import Header from "../components/Header";
 import Text from "../components/Text";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { sampleSwaps } from "../utilities/sampleData";
 import UploadSwap from "../components/UploadSwap";
+import { useAuth } from "../contexts/AuthContext";
+import loadPosts from "../utilities/loadPosts";
+import ExpoFastImage from "expo-fast-image";
 
-// Define theme outside the component
 const theme = {
   background: "#E6F0FA",
   text: "#1E1B4B",
@@ -25,40 +25,65 @@ const theme = {
 };
 
 const Home = ({ navigation }) => {
-  const [swaps, setSwaps] = useState(sampleSwaps.slice(0, 5));
+  const [swaps, setSwaps] = useState([]); // Initialize with an empty array
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const uploadSwapRef = useRef(null);
+  const { getUser, userData, jwt } = useAuth();
 
-  const fetchMoreSwaps = useCallback(() => {
+  useEffect(() => {
+    const loadingSwaps = async () => {
+      if (!jwt) return;
+      setLoading(true);
+      try {
+        const response = await loadPosts(jwt);
+        setSwaps(response); // Set the loaded swaps
+      } catch (error) {
+        console.error("Failed to load swaps:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadingSwaps();
+  }, [jwt]);
+
+  const fetchMoreSwaps = useCallback(async () => {
     if (loading || !hasMore) return;
 
     setLoading(true);
-    setTimeout(() => {
+    try {
       const nextPage = page + 1;
-      const newSwaps = sampleSwaps.slice(0, nextPage * 5);
-      if (newSwaps.length >= sampleSwaps.length) {
+      const response = await loadPosts(jwt, nextPage); // Assuming loadPosts can handle pagination
+      if (response.length === 0) {
         setHasMore(false);
       } else {
-        setSwaps(newSwaps);
+        setSwaps((prevSwaps) => [...prevSwaps, ...response]);
         setPage(nextPage);
       }
+    } catch (error) {
+      console.error("Failed to fetch more swaps:", error);
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, [loading, hasMore, page]);
+    }
+  }, [loading, hasMore, page, jwt]);
 
   const SwapItem = ({ item }) => {
-    const [selectedImage, setSelectedImage] = useState(item.images[0]); // Default to the first image
+    console.log(item);
+    const [selectedImage, setSelectedImage] = useState(item.swapImages[0]); // Default to the first image
 
     return (
       <TouchableOpacity
         style={styles.swapItem}
-        onPress={() => navigation.navigate("UnitPost", { swapId: item.id })}
+        onPress={() =>
+          navigation.navigate("UnitPost", {
+            swapId: item.id,
+            title: item.title,
+          })
+        }
       >
-        {/* Main Image */}
         <View style={styles.imageContainer}>
-          <Image
+          <ExpoFastImage
             source={{ uri: selectedImage }}
             style={styles.mainImage}
             resizeMode="cover"
@@ -67,7 +92,7 @@ const Home = ({ navigation }) => {
 
         {/* Thumbnail Images */}
         <View style={styles.thumbnailContainer}>
-          {item.images.map((image, index) => (
+          {item.swapImages.map((image, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => setSelectedImage(image)}
@@ -76,7 +101,7 @@ const Home = ({ navigation }) => {
                 selectedImage === image && styles.selectedThumbnail,
               ]}
             >
-              <Image
+              <ExpoFastImage
                 source={{ uri: image }}
                 style={styles.thumbnailImage}
                 resizeMode="cover"
@@ -109,14 +134,15 @@ const Home = ({ navigation }) => {
 
   return (
     <Container bg={theme.background}>
+      <StatusBar backgroundColor={"red"} />
       <View style={styles.container}>
         <Header navigation={navigation} />
         <FlatList
           data={swaps}
           renderItem={({ item }) => <SwapItem item={item} />}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => index}
           contentContainerStyle={styles.swapList}
-          onEndReached={fetchMoreSwaps}
+          // onEndReached={fetchMoreSwaps}
           onEndReachedThreshold={0.5}
           ListHeaderComponent={
             <Text style={[styles.sectionTitle, { color: theme.text }]}>

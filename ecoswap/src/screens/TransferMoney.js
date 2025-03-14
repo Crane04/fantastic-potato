@@ -8,6 +8,9 @@ import Text from "../components/Text";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import UploadSwap from "../components/UploadSwap";
+import postRequest from "../api/postRequest";
+import transferMoney from "../utilities/transferMoney";
+import { useAuth } from "../contexts/AuthContext";
 
 // Define theme outside the component (consistent with Home.js and FundWallet.js)
 const theme = {
@@ -22,16 +25,47 @@ const TransferMoney = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const uploadSwapRef = useRef(null);
+  const { getUser, userData, jwt } = useAuth();
 
-  const handleTransfer = () => {
+  const handleTransfer = async () => {
     if (!email || !amount || isNaN(amount) || amount <= 0) {
       Alert.alert("Error", "Please enter a valid email and amount.");
       return;
     }
-    // Simulate transfer
-    Alert.alert("Success", `Transferred $${amount} to ${email}!`);
-    setEmail("");
-    setAmount("");
+
+    Alert.alert(
+      "Confirm Transfer",
+      `Are you sure you want to send #${amount} to ${email}?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes, Proceed",
+          onPress: async () => {
+            try {
+              const transfer = await transferMoney(email, amount, jwt);
+
+              if (transfer.success) {
+                await getUser();
+                Alert.alert("Success", "Transfer completed successfully.");
+                setEmail("");
+                setAmount("");
+              } else {
+                Alert.alert("Error", "Transfer failed. Please try again.");
+              }
+            } catch (error) {
+              Alert.alert(
+                "Error",
+                "Something went wrong. Please try again later."
+              );
+              console.error("Transfer Error:", error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -39,7 +73,9 @@ const TransferMoney = ({ navigation }) => {
       <View style={styles.container}>
         <Header navigation={navigation} />
         <View style={styles.content}>
-          <Text style={[styles.title, { color: theme.text }]}>Transfer Money</Text>
+          <Text style={[styles.title, { color: theme.text }]}>
+            Transfer Money
+          </Text>
           <Input
             label="Recipient Email"
             value={email}

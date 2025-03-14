@@ -14,7 +14,7 @@ import Button from "../components/Button";
 import Container from "../components/Container";
 import Input from "../components/Input";
 import postRequest from "../api/postRequest";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../contexts/AuthContext";
 
 const theme = {
   background: "#E6F0FA",
@@ -30,6 +30,7 @@ const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { login } = useAuth();
 
   const handleSignIn = async () => {
     setError(null);
@@ -40,21 +41,23 @@ const SignInScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const response = await postRequest("/api/auth/login", {
-        identifier,
+      const response = await postRequest("/auth/login", {
+        email: identifier,
         password,
       });
 
       if (response.status === 200) {
         // Store token and navigate to Home
-        await AsyncStorage.setItem("userToken", response.data.token);
+        await login(response?.data?.data?.token);
         setIdentifier("");
         setPassword("");
         navigation.navigate("Home");
       } else if (response.status === 401) {
         setError(response.data?.message || "Invalid credentials");
       } else {
-        setError("Login failed. Please try again later.");
+        setError(
+          "Login failed. Please try again later."
+        );
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -64,7 +67,13 @@ const SignInScreen = ({ navigation }) => {
     }
   };
 
-  const renderInput = (label, placeholder, value, onChangeText, secureTextEntry) => (
+  const renderInput = (
+    label,
+    placeholder,
+    value,
+    onChangeText,
+    secureTextEntry
+  ) => (
     <Input
       label={label}
       placeholder={placeholder}
@@ -72,7 +81,10 @@ const SignInScreen = ({ navigation }) => {
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
       labelStyle={[styles.label, { color: theme.text }]}
-      style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
+      style={[
+        styles.input,
+        { backgroundColor: theme.secondary, borderColor: theme.border },
+      ]}
     />
   );
 

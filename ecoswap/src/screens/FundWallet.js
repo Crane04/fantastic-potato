@@ -1,6 +1,12 @@
 // src/screens/FundWallet.js
 import React, { useState, useRef } from "react";
-import { StyleSheet, View, Alert, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Alert,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Container from "../components/Container";
 import Header from "../components/Header";
@@ -8,8 +14,9 @@ import Text from "../components/Text";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import UploadSwap from "../components/UploadSwap";
+import { fundWallet } from "../utilities/fundWallet";
+import { useAuth } from "../contexts/AuthContext";
 
-// Define theme outside the component (consistent with Home.js)
 const theme = {
   background: "#E6F0FA",
   text: "#1E1B4B",
@@ -21,15 +28,35 @@ const theme = {
 const FundWallet = ({ navigation }) => {
   const [amount, setAmount] = useState("");
   const uploadSwapRef = useRef(null);
+  const { getUser, userData, jwt } = useAuth();
 
-  const handleFund = () => {
-    if (!amount || isNaN(amount) || amount <= 0) {
+  const handleFund = async () => {
+    if (!amount || isNaN(amount) || parseInt(1000) <= 0) {
       Alert.alert("Error", "Please enter a valid amount.");
       return;
     }
-    // Simulate funding
-    Alert.alert("Success", `Funded $${amount} to wallet!`);
-    setAmount("");
+
+    // Format the amount with commas (e.g., 1000000 -> "1,000,000")
+    const formattedAmount = parseFloat(amount).toLocaleString("en-US");
+
+    Alert.alert(
+      "Confirm",
+      `Are you sure you want to fund your wallet with ₦${formattedAmount}?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes",
+          onPress: async () => {
+            const response = await fundWallet(amount, jwt);
+            console.log(response);
+            if (Linking.canOpenURL(response.checkoutUrl)) {
+              Linking.openURL(response.checkoutUrl);
+            }
+            setAmount("");
+          },
+        },
+      ]
+    );
   };
 
   return (

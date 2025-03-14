@@ -12,7 +12,7 @@ const postRequest = async (path, data, options = {}) => {
   } catch (error) {
     console.error(
       `Error making POST request to ${path}:`,
-      JSON.stringify(error)
+      JSON.stringify(error.response.data)
     );
     return {
       data: error?.response?.data,

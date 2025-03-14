@@ -13,6 +13,10 @@ import Feather from "@expo/vector-icons/Feather";
 import Input from "./Input";
 import Text from "./Text";
 import Button from "./Button";
+import getRequest from "../api/getRequest";
+import { BACKEND_URL } from "../utilities/constants";
+import { useAuth } from "../contexts/AuthContext";
+import axios from "axios";
 
 // Define theme outside the component
 const theme = {
@@ -30,6 +34,7 @@ const UploadSwap = forwardRef((props, ref) => {
   const [images, setImages] = useState([]);
   const [desiredItem, setDesiredItem] = useState("");
   const [error, setError] = useState(null);
+  const { getUser, userData, jwt } = useAuth();
 
   useImperativeHandle(ref, () => ({
     openModal: () => {
@@ -40,9 +45,12 @@ const UploadSwap = forwardRef((props, ref) => {
   }));
 
   const handleImagePicker = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      setError("Permission Denied: You need to allow access to the photo library.");
+      setError(
+        "Permission Denied: You need to allow access to the photo library."
+      );
       return;
     }
 
@@ -72,7 +80,8 @@ const UploadSwap = forwardRef((props, ref) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+
     if (!swapTitle.trim()) {
       setError("Swap Title is required.");
       return;
@@ -89,15 +98,49 @@ const UploadSwap = forwardRef((props, ref) => {
       setError("Desired item is required.");
       return;
     }
-    setError("Swap uploaded successfully!");
-    setTimeout(() => {
-      setModalVisible(false);
-      setSwapTitle("");
-      setSwapDescription("");
-      setImages([]);
-      setDesiredItem("");
-      setError(null);
-    }, 2000);
+
+    const formData = new FormData();
+
+    // Append text data
+    formData.append("title", swapTitle);
+    formData.append("description", swapDescription);
+    formData.append("swap_preference", desiredItem);
+    formData.append("city", userData?.city || "N/A");
+    formData.append("state", userData?.state || "N/A");
+    formData.append("country", userData?.country || "N/A");
+
+    // Append images
+    images.forEach((image, index) => {
+      formData.append(`images`, {
+        uri: image.uri,
+        name: `swap_image_${index}.jpg`, // Modify based on actual file type
+        type: "image/jpeg",
+      });
+    });
+
+    try {
+      const response = await axios.post(`${BACKEND_URL}/swapPosts`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${jwt}`, // Add authentication if required
+        },
+      });
+      console.log(response)
+      if (response.status == "200") {
+        alert("Swap uploaded successfully!");
+        setTimeout(() => {
+          setModalVisible(false);
+          setSwapTitle("");
+          setSwapDescription("");
+          setImages([]);
+          setDesiredItem("");
+          setError(null);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      setError("Failed to upload swap. Please try again.");
+    }
   };
 
   return (
@@ -109,7 +152,9 @@ const UploadSwap = forwardRef((props, ref) => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { backgroundColor: theme.modalBg }]}>
+          <View
+            style={[styles.modalContainer, { backgroundColor: theme.modalBg }]}
+          >
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
@@ -117,7 +162,9 @@ const UploadSwap = forwardRef((props, ref) => {
               <Feather name="x" size={24} color={theme.text} />
             </TouchableOpacity>
             <ScrollView>
-              <Text style={[styles.modalTitle, { color: theme.text }]}>Upload Swap</Text>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>
+                Upload Swap
+              </Text>
 
               <Input
                 label="Swap Title"
@@ -134,7 +181,11 @@ const UploadSwap = forwardRef((props, ref) => {
                 placeholder="Describe your item"
                 style={{ borderColor: theme.border }}
               />
-              <Button onPress={handleImagePicker} text="Select 3-5 Images" color={theme.accent} />
+              <Button
+                onPress={handleImagePicker}
+                text="Select 3-5 Images"
+                color={theme.accent}
+              />
               {images.length > 0 && (
                 <View style={styles.imagePreviewContainer}>
                   {images.map((image, index) => (
@@ -160,8 +211,16 @@ const UploadSwap = forwardRef((props, ref) => {
                 placeholder="What you'd like to get"
                 style={{ borderColor: theme.border }}
               />
-              {error && <Text style={[styles.error, { color: theme.error }]}>{error}</Text>}
-              <Button onPress={handleSubmit} text="Submit" color={theme.accent} />
+              {error && (
+                <Text style={[styles.error, { color: theme.error }]}>
+                  {error}
+                </Text>
+              )}
+              <Button
+                onPress={handleSubmit}
+                text="Submit"
+                color={theme.accent}
+              />
             </ScrollView>
           </View>
         </View>

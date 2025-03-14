@@ -16,9 +16,6 @@ import Button from "../components/Button";
 import Container from "../components/Container";
 import Input from "../components/Input";
 import postRequest from "../api/postRequest";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// Define theme outside the component (consistent with other screens)
 const theme = {
   background: "#E6F0FA",
   text: "#1E1B4B",
@@ -91,7 +88,7 @@ const SignUpScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const response = await postRequest("/api/auth/register", {
+      const response = await postRequest("/auth/register", {
         name, 
         phone, 
         email,
@@ -101,8 +98,8 @@ const SignUpScreen = ({ navigation }) => {
         country,
         password,
       });
-
-      if (response.status === 201) {
+      console.log(response)
+      if (response.status === 200) {
         // Registration successful
         resetForm();
         // Show success message before redirecting
@@ -129,7 +126,7 @@ const SignUpScreen = ({ navigation }) => {
   return (
     <Container bg={theme.background}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
           {/* Header with Logo */}
           <View style={styles.headerContainer}>
             <View style={styles.logoContainer}>
@@ -249,7 +246,7 @@ const SignUpScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </ScrollView>
-        </View>
+        </ScrollView>
       </TouchableWithoutFeedback>
     </Container>
   );

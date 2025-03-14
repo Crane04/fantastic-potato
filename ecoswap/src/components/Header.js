@@ -1,10 +1,38 @@
 // src/components/Header.js
-import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  StatusBar,
+  AppState,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Text from "../components/Text";
+import { useAuth } from "../contexts/AuthContext";
 
 const Header = ({ navigation }) => {
+  const { getUser, userData } = useAuth();
+  const [appState, setAppState] = useState(AppState.currentState);
+
+  const handleAppStateChange = async(nextAppState) => {
+    if (appState.match(/inactive|background/) || nextAppState === "active") {
+      await getUser();
+    } else if (nextAppState === "background") {
+    }
+    setAppState(nextAppState);
+  };
+
+  useEffect(() => {
+    const appStateListener = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
+    return () => {
+      appStateListener.remove();
+    };
+  }, []);
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -15,8 +43,13 @@ const Header = ({ navigation }) => {
         <Text style={styles.logoText}>EcoSwap</Text>
       </TouchableOpacity>
       <View style={styles.coinContainer}>
-        <Ionicons name="cash" size={20} color="#ffffff" style={styles.coinIcon} />
-        <Text style={styles.coinText}>100</Text>
+        <Ionicons
+          name="cash"
+          size={20}
+          color="#ffffff"
+          style={styles.coinIcon}
+        />
+        <Text style={styles.coinText}>{userData?.balance || 0}</Text>
       </View>
     </View>
   );
