@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { View, TextInput, StyleSheet } from "react-native";
-import Text from "./Text"; // Using the updated WText
+import Text from "./Text";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
-
 const Input = ({
   label,
   placeholder,
@@ -13,26 +12,23 @@ const Input = ({
   secureTextEntry,
   type,
   options,
-<<<<<<< HEAD
 }) => {
   const [open, setOpen] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
   if (options) {
     console.log(options)
     return (
-    console.log(options);
-    return (
       <>
-        <Text style={[styles.label, labelStyle]}>{label}</Text>
+        <Text style={styles.label}>{label}</Text>
         <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: "blue" }, style]}
->>>>>>> 7f98822 (Added new updates to branch)
+          style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           inputSearchStyle={styles.inputSearchStyle}
           iconStyle={styles.iconStyle}
           data={options}
           search
+          maxHeight={300}
           labelField="label"
           valueField="value"
           placeholder={!isFocus ? "Select item" : "..."}
@@ -53,34 +49,29 @@ const Input = ({
       </>
     );
   }
-
   if (type === "date") {
     return (
       <View>
-        <Text style={[styles.label, labelStyle]}>{label}</Text>
-        <Text onPress={() => setOpen(true)} style={[styles.dateText, style]}>
+        <Text style={styles.label}>{label}</Text>
+        <Text onPress={() => setOpen(true)} style={styles.dateText}>
           {value.toISOString().split("T")[0]}
         </Text>
-        {open && (
-          <DateTimePicker
-            mode="datetime"
-            display="default"
-            value={value}
-            onChange={(event, newDate) => {
-              setOpen(false);
-              onChangeText(newDate);
-            }}
-          />
-        )}
+        <DateTimePicker
+          mode="datetime"
+          display="default"
+          value={value}
+          onChange={(event, newDate) => {
+            onChangeText(newDate);
+          }}
+        />
       </View>
     );
   }
-
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, labelStyle]}>{label}</Text>
+      <Text style={styles.label}>{label}</Text>
       <TextInput
-        style={[styles.input, style]} // Use the passed style for dynamic theming
+        style={styles.input}
         placeholder={placeholder}
         value={value}
         onChangeText={onChangeText}
@@ -94,43 +85,39 @@ const Input = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 6,
+    marginVertical: 10,
   },
   label: {
     fontSize: 16,
     marginBottom: 5,
-    fontWeight: "500", // Ensure label renders prominently
   },
   input: {
     fontSize: 16,
     padding: 10,
+    borderColor: "#212121",
+    borderWidth: 1,
     borderRadius: 5,
-    borderWidth: 1.5, // Ensure border is visible
+    color: "royal-blue",
+    
   },
   dateText: {
     fontSize: 16,
     padding: 10,
-    borderWidth: 1.5,
+    borderColor: "rgb(79 70 229)",
+    borderWidth: 1,
     borderRadius: 5,
   },
   dropdown: {
     height: 50,
-<<<<<<< HEAD
     borderColor: 'gray',
     borderWidth: 0.5,
-=======
-    borderWidth: 1.5,
->>>>>>> 7f98822 (Added new updates to branch)
     borderRadius: 8,
     paddingHorizontal: 8,
   },
   icon: {
     marginRight: 5,
   },
-<<<<<<< HEAD
 
-=======
->>>>>>> 7f98822 (Added new updates to branch)
   placeholderStyle: {
     fontSize: 16,
   },
@@ -147,8 +134,5 @@ const styles = StyleSheet.create({
   },
 });
 
-<<<<<<< HEAD
 export default Input;
-=======
-export default Input;
->>>>>>> 7f98822 (Added new updates to branch)
+

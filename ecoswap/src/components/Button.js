@@ -16,14 +16,8 @@ const Button = ({
       <TouchableOpacity
         style={[
           styles.btn,
-<<<<<<< HEAD
-          {
-            // width: width ? "100%" : "90%",
-          },
-=======
           { backgroundColor: color || "#002366" }, // Fallback to blue theme
           { width: width || "100%" },
->>>>>>> 7f98822 (Added new updates to branch)
           style,
         ]}
         onPress={onPress}
@@ -37,10 +31,6 @@ const Button = ({
 
 const styles = StyleSheet.create({
   btn: {
-<<<<<<< HEAD
-    backgroundColor: "#002366",
-=======
->>>>>>> 7f98822 (Added new updates to branch)
     justifyContent: "center",
     alignItems: "center",
     height: 45,
@@ -49,17 +39,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-<<<<<<< HEAD
-
-    width: "100%"
-  },
-  btnText: {
-    color: "#fff",
-  },
-});
-
-export default Button;
-=======
   },
   btnText: {
     fontSize: 16,
@@ -68,4 +47,3 @@ export default Button;
 });
 
 export default Button;
->>>>>>> 7f98822 (Added new updates to branch)
