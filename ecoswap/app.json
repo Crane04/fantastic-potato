@@ -22,7 +22,12 @@
       }
     },
     "web": {
+<<<<<<< HEAD
       "favicon": "./assets/favicon.png"
+=======
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+>>>>>>> 7f98822 (Added new updates to branch)
     }
   }
 }
