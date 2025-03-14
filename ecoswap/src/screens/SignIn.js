@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 // src/screens/SignIn.js
->>>>>>> 7f98822 (Added new updates to branch)
 import React, { useState } from "react";
 import {
   View,
@@ -10,13 +7,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
-<<<<<<< HEAD
-} from "react-native";
-=======
   ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
->>>>>>> 7f98822 (Added new updates to branch)
 import Text from "../components/Text";
 import Button from "../components/Button";
 import Container from "../components/Container";
@@ -28,15 +21,6 @@ const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-<<<<<<< HEAD
-
-  const handleSignIn = async () => {
-    if (!identifier || !password) {
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-=======
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const theme = {
@@ -67,7 +51,6 @@ const SignInScreen = ({ navigation }) => {
       return;
     }
     setIsLoading(true);
->>>>>>> 7f98822 (Added new updates to branch)
 
     try {
       const response = await postRequest("/users/signin", {
@@ -76,17 +59,9 @@ const SignInScreen = ({ navigation }) => {
       });
 
       if (response.status === 200) {
-<<<<<<< HEAD
-        // Login successful, navigate to the next screen
-        await login(response.data.token);
-        navigation.navigate("Tabs");
-      } else {
-        // Login failed, display an error message
-=======
         await login(response.data.token); // Assuming 'login' is defined elsewhere
         navigation.navigate("Tabs");
       } else {
->>>>>>> 7f98822 (Added new updates to branch)
         setError("Invalid Credentials");
       }
     } catch (error) {
@@ -104,39 +79,12 @@ const SignInScreen = ({ navigation }) => {
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
-<<<<<<< HEAD
-=======
       labelStyle={[styles.label, { color: currentTheme.text }]}
       style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border, borderWidth: 1.5 }]}
->>>>>>> 7f98822 (Added new updates to branch)
     />
   );
 
   return (
-<<<<<<< HEAD
-    <Container bg={"#212121"}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <Text style={styles.header}>Log In to Your Account</Text>
-          {renderInput("Matric Number or Email", "220221XYZ", identifier, setIdentifier)}
-          {renderInput("Password", "*******", password, setPassword, true)}
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#7F38FF" />
-          ) : (
-            <Button text="Log In" onPress={handleSignIn} />
-          )}
-          {error && <Text style={styles.error}>{error}</Text>}
-          <View style={styles.bottom}>
-            <Text>Don’t have an account, yet?</Text>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("SignUp");
-              }}
-            >
-              <Text style={styles.authText}>Sign up</Text>
-            </TouchableOpacity>
-          </View>
-=======
     <Container bg={currentTheme.background}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
@@ -208,41 +156,12 @@ const SignInScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </ScrollView>
->>>>>>> 7f98822 (Added new updates to branch)
         </View>
       </TouchableWithoutFeedback>
     </Container>
   );
 };
 
-<<<<<<< HEAD
-export const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-  },
-  header: {
-    textAlign: "center",
-    fontSize: 24,
-    marginTop: 25,
-    marginBottom: 20,
-  },
-  bottom: {
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    marginTop: 20,
-
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  authText: {
-    color: "#4B0082",
-  },
-  error: {
-    color: "#ff0000",
-    marginBottom: 10,
-=======
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -311,7 +230,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     fontSize: 14,
->>>>>>> 7f98822 (Added new updates to branch)
   },
 });
 

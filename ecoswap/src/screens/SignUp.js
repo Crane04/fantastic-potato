@@ -6,27 +6,16 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
-<<<<<<< HEAD
-} from "react-native";
-=======
   StyleSheet,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
->>>>>>> 7f98822 (Added new updates to branch)
 import Text from "../components/Text";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import Input from "../components/Input";
-<<<<<<< HEAD
-import { styles } from "./SignIn";
-import postRequest from "../api/postRequest";
-
-const SignInScreen = ({ navigation }) => {
-=======
 import postRequest from "../api/postRequest";
 
 const SignUpScreen = ({ navigation }) => {
->>>>>>> 7f98822 (Added new updates to branch)
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -34,70 +23,6 @@ const SignUpScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [cPassword, setCPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-<<<<<<< HEAD
-
-  return (
-    <Container bg={"#121212"}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView style={styles.container}>
-          <Text style={styles.header}>Create An Account</Text>
-          <Input
-            label={"First Name"}
-            placeholder="John"
-            value={firstName}
-            onChangeText={(text) => setFirstName(text)}
-          />
-          <Input
-            label={"Last Name"}
-            placeholder="Doe"
-            value={lastName}
-            onChangeText={(text) => setLastName(text)}
-          />
-          <Input
-            label={"Phone Number"}
-            placeholder="090-123-456-78"
-            value={phoneNumber}
-            onChangeText={(text) => setPhoneNumber(text)}
-            type={"number-pad"}
-          />
-          <Input
-            label={"Email"}
-            placeholder="johndoe@lasu.com"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-
-          <Input
-            label={"Password"}
-            placeholder="*******"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry
-          />
-          <Input
-            label={"Confirm Password"}
-            placeholder="*******"
-            value={cPassword}
-            onChangeText={(text) => setCPassword(text)}
-            secureTextEntry
-          />
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#7F38FF" />
-          ) : (
-            <Button text="Sign Up" />
-          )}
-          <View style={styles.bottom}>
-            <Text>Already have an account?</Text>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("SignIn");
-              }}
-            >
-              <Text style={styles.authText}>Login</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-=======
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [error, setError] = useState(null); // Added for custom error messages
 
@@ -276,15 +201,11 @@ const SignUpScreen = ({ navigation }) => {
             </View>
           </ScrollView>
         </View>
->>>>>>> 7f98822 (Added new updates to branch)
       </TouchableWithoutFeedback>
     </Container>
   );
 };
 
-<<<<<<< HEAD
-export default SignInScreen;
-=======
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -360,4 +281,3 @@ const styles = StyleSheet.create({
 });
 
 export default SignUpScreen;
->>>>>>> 7f98822 (Added new updates to branch)
