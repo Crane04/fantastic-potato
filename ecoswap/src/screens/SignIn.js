@@ -1,73 +1,46 @@
-<<<<<<< HEAD
-=======
 // src/screens/SignIn.js
->>>>>>> 7f98822 (Added new updates to branch)
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
-  View,
   StyleSheet,
+  View,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator,
-<<<<<<< HEAD
-} from "react-native";
-=======
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
->>>>>>> 7f98822 (Added new updates to branch)
 import Text from "../components/Text";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import Input from "../components/Input";
+import UploadSwap from "../components/UploadSwap";
 import postRequest from "../api/postRequest";
+
+// Define theme outside the component (consistent with other screens)
+const theme = {
+  background: "#E6F0FA",
+  text: "#1E1B4B",
+  accent: "#280967",
+  secondary: "#BFDBFE",
+  border: "#1E3A8A",
+  error: "#EF4444",
+};
 
 const SignInScreen = ({ navigation }) => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-<<<<<<< HEAD
+  const uploadSwapRef = useRef(null);
 
   const handleSignIn = async () => {
-    if (!identifier || !password) {
-      return;
-    }
-    setIsLoading(true);
     setError(null);
-=======
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const theme = {
-    light: {
-      background: "#E6F0FA", // Light blue-gray
-      text: "#1E1B4B", // Darker blue for better contrast (adjusted from #1E3A8A)
-      accent: "#280967", // Deep blue
-      secondary: "#BFDBFE", // Light blue for inputs
-      error: "#EF4444", // Red for errors
-      border: "#1E3A8A", // Dark blue for input borders
-    },
-    dark: {
-      background: "#1E1B4B", // Very dark blue
-      text: "#DBEAFE", // Light blue-gray
-      accent: "#3B82F6", // Brighter blue for dark mode
-      secondary: "#4B5EAA", // Medium-dark blue for inputs
-      error: "#F87171", // Lighter red for dark mode
-      border: "#BFDBFE", // Light blue for input borders
-    },
-  };
-
-  const currentTheme = isDarkMode ? theme.dark : theme.light;
-
-  const handleSignIn = async () => {
-    setError(null); // Reset error state
     if (!identifier || !password) {
       setError("Please fill in all fields");
       return;
     }
     setIsLoading(true);
->>>>>>> 7f98822 (Added new updates to branch)
 
     try {
       const response = await postRequest("/users/signin", {
@@ -76,17 +49,11 @@ const SignInScreen = ({ navigation }) => {
       });
 
       if (response.status === 200) {
-<<<<<<< HEAD
-        // Login successful, navigate to the next screen
-        await login(response.data.token);
-        navigation.navigate("Tabs");
+        // Assuming 'login' is a function to store the token (e.g., in AsyncStorage)
+        // If not defined, you'll need to implement it or remove this line
+        // await login(response.data.token);
+        navigation.navigate("Home"); // Changed to "Home" since "Tabs" isn't defined
       } else {
-        // Login failed, display an error message
-=======
-        await login(response.data.token); // Assuming 'login' is defined elsewhere
-        navigation.navigate("Tabs");
-      } else {
->>>>>>> 7f98822 (Added new updates to branch)
         setError("Invalid Credentials");
       }
     } catch (error) {
@@ -104,71 +71,27 @@ const SignInScreen = ({ navigation }) => {
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
-<<<<<<< HEAD
-=======
-      labelStyle={[styles.label, { color: currentTheme.text }]}
-      style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border, borderWidth: 1.5 }]}
->>>>>>> 7f98822 (Added new updates to branch)
+      labelStyle={[styles.label, { color: theme.text }]}
+      style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
     />
   );
 
   return (
-<<<<<<< HEAD
-    <Container bg={"#212121"}>
+    <Container bg={theme.background}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <Text style={styles.header}>Log In to Your Account</Text>
-          {renderInput("Matric Number or Email", "220221XYZ", identifier, setIdentifier)}
-          {renderInput("Password", "*******", password, setPassword, true)}
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#7F38FF" />
-          ) : (
-            <Button text="Log In" onPress={handleSignIn} />
-          )}
-          {error && <Text style={styles.error}>{error}</Text>}
-          <View style={styles.bottom}>
-            <Text>Don’t have an account, yet?</Text>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("SignUp");
-              }}
-            >
-              <Text style={styles.authText}>Sign up</Text>
-            </TouchableOpacity>
-          </View>
-=======
-    <Container bg={currentTheme.background}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          {/* Header with Icon and Toggle Button */}
+          {/* Header with Logo */}
           <View style={styles.headerContainer}>
             <View style={styles.logoContainer}>
-              <Icon name="leaf" size={40} color={currentTheme.accent} />
-              <Text style={[styles.header, { color: currentTheme.text }]}>
+              <Icon name="leaf" size={40} color={theme.accent} />
+              <Text style={[styles.header, { color: theme.text }]}>
                 EcoSwap
               </Text>
             </View>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                {
-                  backgroundColor: isDarkMode
-                    ? currentTheme.secondary
-                    : currentTheme.accent,
-                },
-              ]}
-              onPress={() => setIsDarkMode(!isDarkMode)}
-            >
-              <Icon
-                name={isDarkMode ? "weather-sunny" : "weather-night"}
-                size={20}
-                color={isDarkMode ? currentTheme.text : currentTheme.background}
-              />
-            </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={[styles.subHeader, { color: currentTheme.text }]}>
+            <Text style={[styles.subHeader, { color: theme.text }]}>
               Log In to Your Account
             </Text>
 
@@ -181,68 +104,79 @@ const SignInScreen = ({ navigation }) => {
             {renderInput("Password", "*******", password, setPassword, true)}
 
             {isLoading ? (
-              <ActivityIndicator size="large" color={currentTheme.accent} />
+              <ActivityIndicator size="large" color={theme.accent} />
             ) : (
               <Button
                 text="Log In"
                 onPress={handleSignIn}
-                style={[styles.signInButton, { backgroundColor: currentTheme.accent }]}
+                style={[styles.signInButton, { backgroundColor: theme.accent }]}
                 textStyle={styles.signInButtonText}
               />
             )}
 
             {error && (
-              <Text style={[styles.error, { color: currentTheme.error }]}>
+              <Text style={[styles.error, { color: theme.error }]}>
                 {error}
               </Text>
             )}
 
             <View style={styles.bottom}>
-              <Text style={{ color: currentTheme.text }}>
+              <Text style={{ color: theme.text }}>
                 Don’t have an account yet?
               </Text>
               <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-                <Text style={[styles.authText, { color: currentTheme.accent }]}>
+                <Text style={[styles.authText, { color: theme.accent }]}>
                   Sign Up
                 </Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
->>>>>>> 7f98822 (Added new updates to branch)
+
+          {/* Bottom Navigation Bar with Upload Button */}
+          <View style={styles.bottomNav}>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate("Home")}
+            >
+              <Icon name="home" size={24} color={theme.accent} />
+              <Text style={styles.navText}>Home</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate("FundWallet")}
+            >
+              <Icon name="wallet" size={24} color={theme.accent} />
+              <Text style={styles.navText}>Fund</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.uploadButton}
+              onPress={() => uploadSwapRef.current?.openModal()}
+            >
+              <Icon name="upload" size={28} color="#ffffff" />
+              <Text style={styles.uploadText}>Upload</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate("TransferMoney")}
+            >
+              <Icon name="send" size={24} color={theme.accent} />
+              <Text style={styles.navText}>Transfer</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate("Profile")}
+            >
+              <Icon name="account" size={24} color={theme.accent} />
+              <Text style={styles.navText}>Profile</Text>
+            </TouchableOpacity>
+          </View>
+          <UploadSwap ref={uploadSwapRef} />
         </View>
       </TouchableWithoutFeedback>
     </Container>
   );
 };
 
-<<<<<<< HEAD
-export const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-  },
-  header: {
-    textAlign: "center",
-    fontSize: 24,
-    marginTop: 25,
-    marginBottom: 20,
-  },
-  bottom: {
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    marginTop: 20,
-
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  authText: {
-    color: "#4B0082",
-  },
-  error: {
-    color: "#ff0000",
-    marginBottom: 10,
-=======
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -250,7 +184,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
@@ -263,12 +197,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
   },
-  toggleButton: {
-    padding: 8,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   subHeader: {
     fontSize: 24,
     fontWeight: "600",
@@ -278,13 +206,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-    fontWeight: "500", 
+    fontWeight: "500",
   },
   input: {
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
     fontSize: 16,
+    borderWidth: 1,
   },
   signInButton: {
     paddingVertical: 10,
@@ -311,7 +240,35 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     fontSize: 14,
->>>>>>> 7f98822 (Added new updates to branch)
+  },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingVertical: 10,
+    backgroundColor: "#280967",
+    borderTopWidth: 1,
+    borderTopColor: "#ffffff",
+  },
+  navButton: {
+    alignItems: "center",
+  },
+  navText: {
+    color: theme.text,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  uploadButton: {
+    backgroundColor: "#FF5722",
+    padding: 10,
+    borderRadius: 20,
+    alignItems: "center",
+    width: 80,
+  },
+  uploadText: {
+    color: "#ffffff",
+    fontSize: 12,
+    marginTop: 2,
   },
 });
 

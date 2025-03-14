@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-import { StyleSheet, View } from "react-native";
-import Container from "../components/Container";
-import Header from "../components/Header";
-import UploadSwap from "../components/UploadSwap"
-
-const Home = () => {
-  return (
-    <Container bg={"#212121"}>
-      <View style={styles.container}>
-        <Header />
-        <UploadSwap />
-=======
 // src/screens/Home.js
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
@@ -192,7 +179,6 @@ const Home = ({ navigation }) => {
           </TouchableOpacity>
         </View>
         <UploadSwap ref={uploadSwapRef} />
->>>>>>> 7f98822 (Added new updates to branch)
       </View>
     </Container>
   );
@@ -202,11 +188,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-<<<<<<< HEAD
-});
-
-export default Home;
-=======
   sectionTitle: {
     fontSize: 20,
     fontWeight: "600",
@@ -306,4 +287,3 @@ export default Home;
 });
 
 export default Home;
->>>>>>> 7f98822 (Added new updates to branch)

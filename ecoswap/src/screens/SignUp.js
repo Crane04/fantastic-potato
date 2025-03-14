@@ -1,32 +1,33 @@
-import React, { useState } from "react";
+// src/screens/SignUp.js
+import React, { useState, useRef } from "react";
 import {
+  StyleSheet,
   View,
-  ActivityIndicator,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
-<<<<<<< HEAD
-} from "react-native";
-=======
-  StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
->>>>>>> 7f98822 (Added new updates to branch)
 import Text from "../components/Text";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import Input from "../components/Input";
-<<<<<<< HEAD
-import { styles } from "./SignIn";
+import UploadSwap from "../components/UploadSwap";
 import postRequest from "../api/postRequest";
 
-const SignInScreen = ({ navigation }) => {
-=======
-import postRequest from "../api/postRequest";
+// Define theme outside the component (consistent with other screens)
+const theme = {
+  background: "#E6F0FA",
+  text: "#1E1B4B",
+  accent: "#280967",
+  secondary: "#BFDBFE",
+  border: "#1E3A8A",
+  error: "#EF4444",
+};
 
 const SignUpScreen = ({ navigation }) => {
->>>>>>> 7f98822 (Added new updates to branch)
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -34,96 +35,10 @@ const SignUpScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [cPassword, setCPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-<<<<<<< HEAD
-
-  return (
-    <Container bg={"#121212"}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView style={styles.container}>
-          <Text style={styles.header}>Create An Account</Text>
-          <Input
-            label={"First Name"}
-            placeholder="John"
-            value={firstName}
-            onChangeText={(text) => setFirstName(text)}
-          />
-          <Input
-            label={"Last Name"}
-            placeholder="Doe"
-            value={lastName}
-            onChangeText={(text) => setLastName(text)}
-          />
-          <Input
-            label={"Phone Number"}
-            placeholder="090-123-456-78"
-            value={phoneNumber}
-            onChangeText={(text) => setPhoneNumber(text)}
-            type={"number-pad"}
-          />
-          <Input
-            label={"Email"}
-            placeholder="johndoe@lasu.com"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-
-          <Input
-            label={"Password"}
-            placeholder="*******"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry
-          />
-          <Input
-            label={"Confirm Password"}
-            placeholder="*******"
-            value={cPassword}
-            onChangeText={(text) => setCPassword(text)}
-            secureTextEntry
-          />
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#7F38FF" />
-          ) : (
-            <Button text="Sign Up" />
-          )}
-          <View style={styles.bottom}>
-            <Text>Already have an account?</Text>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("SignIn");
-              }}
-            >
-              <Text style={styles.authText}>Login</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-=======
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [error, setError] = useState(null); // Added for custom error messages
-
-  const theme = {
-    light: {
-      background: "#E6F0FA", // Light blue-gray
-      text: "#1E1B4B", // Darker blue for better contrast
-      accent: "#280967", // Deep blue
-      secondary: "#BFDBFE", // Light blue for inputs
-      error: "#EF4444", // Red for errors
-      border: "#1E3A8A", // Dark blue for input borders
-    },
-    dark: {
-      background: "#1E1B4B", // Very dark blue
-      text: "#DBEAFE", // Light blue-gray
-      accent: "#3B82F6", // Brighter blue for dark mode
-      secondary: "#4B5EAA", // Medium-dark blue for inputs
-      error: "#F87171", // Lighter red for dark mode
-      border: "#BFDBFE", // Light blue for input borders
-    },
-  };
-
-  const currentTheme = isDarkMode ? theme.dark : theme.light;
+  const [error, setError] = useState(null);
+  const uploadSwapRef = useRef(null);
 
   const handleSignUp = async () => {
-    // Reset error state
     setError(null);
 
     // Validation
@@ -160,38 +75,21 @@ const SignUpScreen = ({ navigation }) => {
   };
 
   return (
-    <Container bg={currentTheme.background}>
+    <Container bg={theme.background}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          {/* Header with Icon and Toggle Button */}
+          {/* Header with Logo */}
           <View style={styles.headerContainer}>
             <View style={styles.logoContainer}>
-              <Icon name="leaf" size={40} color={currentTheme.accent} />
-              <Text style={[styles.header, { color: currentTheme.text }]}>
+              <Icon name="leaf" size={40} color={theme.accent} />
+              <Text style={[styles.header, { color: theme.text }]}>
                 EcoSwap
               </Text>
             </View>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                {
-                  backgroundColor: isDarkMode
-                    ? currentTheme.secondary
-                    : currentTheme.accent,
-                },
-              ]}
-              onPress={() => setIsDarkMode(!isDarkMode)}
-            >
-              <Icon
-                name={isDarkMode ? "weather-sunny" : "weather-night"}
-                size={20}
-                color={isDarkMode ? currentTheme.text : currentTheme.background}
-              />
-            </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={[styles.subHeader, { color: currentTheme.text }]}>
+            <Text style={[styles.subHeader, { color: theme.text }]}>
               Create An Account
             </Text>
 
@@ -200,16 +98,16 @@ const SignUpScreen = ({ navigation }) => {
               placeholder="John"
               value={firstName}
               onChangeText={(text) => setFirstName(text)}
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
               label="Last Name"
               placeholder="Doe"
               value={lastName}
               onChangeText={(text) => setLastName(text)}
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
               label="Phone Number"
@@ -217,16 +115,16 @@ const SignUpScreen = ({ navigation }) => {
               value={phoneNumber}
               onChangeText={(text) => setPhoneNumber(text)}
               keyboardType="number-pad"
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
               label="Email"
               placeholder="johndoe@ecoswap.com"
               value={email}
               onChangeText={(text) => setEmail(text)}
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
               label="Password"
@@ -234,8 +132,8 @@ const SignUpScreen = ({ navigation }) => {
               value={password}
               onChangeText={(text) => setPassword(text)}
               secureTextEntry
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
             <Input
               label="Confirm Password"
@@ -243,48 +141,84 @@ const SignUpScreen = ({ navigation }) => {
               value={cPassword}
               onChangeText={(text) => setCPassword(text)}
               secureTextEntry
-              labelStyle={[styles.label, { color: currentTheme.text }]}
-              style={[styles.input, { backgroundColor: currentTheme.secondary, borderColor: currentTheme.border }]}
+              labelStyle={[styles.label, { color: theme.text }]}
+              style={[styles.input, { backgroundColor: theme.secondary, borderColor: theme.border }]}
             />
 
             {isLoading ? (
-              <ActivityIndicator size="large" color={currentTheme.accent} />
+              <ActivityIndicator size="large" color={theme.accent} />
             ) : (
               <Button
                 text="Sign Up"
                 onPress={handleSignUp}
-                style={[styles.signUpButton, { backgroundColor: currentTheme.accent }]}
+                style={[styles.signUpButton, { backgroundColor: theme.accent }]}
                 textStyle={styles.signUpButtonText}
               />
             )}
 
             {error && (
-              <Text style={[styles.error, { color: currentTheme.error }]}>
+              <Text style={[styles.error, { color: theme.error }]}>
                 {error}
               </Text>
             )}
 
             <View style={styles.bottom}>
-              <Text style={{ color: currentTheme.text }}>
+              <Text style={{ color: theme.text }}>
                 Already have an account?
               </Text>
               <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
-                <Text style={[styles.authText, { color: currentTheme.accent }]}>
+                <Text style={[styles.authText, { color: theme.accent }]}>
                   Login
                 </Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
+
+          {/* Bottom Navigation Bar with Upload Button */}
+          <View style={styles.bottomNav}>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate("Home")}
+            >
+              <Icon name="home" size={24} color={theme.accent} />
+              <Text style={styles.navText}>Home</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate("FundWallet")}
+            >
+              <Icon name="wallet" size={24} color={theme.accent} />
+              <Text style={styles.navText}>Fund</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.uploadButton}
+              onPress={() => uploadSwapRef.current?.openModal()}
+            >
+              <Icon name="upload" size={28} color="#ffffff" />
+              <Text style={styles.uploadText}>Upload</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate("TransferMoney")}
+            >
+              <Icon name="send" size={24} color={theme.accent} />
+              <Text style={styles.navText}>Transfer</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate("Profile")}
+            >
+              <Icon name="account" size={24} color={theme.accent} />
+              <Text style={styles.navText}>Profile</Text>
+            </TouchableOpacity>
+          </View>
+          <UploadSwap ref={uploadSwapRef} />
         </View>
->>>>>>> 7f98822 (Added new updates to branch)
       </TouchableWithoutFeedback>
     </Container>
   );
 };
 
-<<<<<<< HEAD
-export default SignInScreen;
-=======
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -292,7 +226,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
@@ -305,12 +239,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
   },
-  toggleButton: {
-    padding: 8,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   subHeader: {
     fontSize: 24,
     fontWeight: "600",
@@ -318,17 +246,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   label: {
-    fontSize: 15,
-    marginBottom: 1,
-    fontWeight: "500", 
+    fontSize: 16,
+    marginBottom: 5,
+    fontWeight: "500",
   },
   input: {
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
     fontSize: 16,
-    borderWidth: 1.5, 
-    borderColor: "#000000", 
+    borderWidth: 1,
   },
   signUpButton: {
     paddingVertical: 10,
@@ -357,7 +284,35 @@ const styles = StyleSheet.create({
   authText: {
     fontWeight: "bold",
   },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingVertical: 10,
+    backgroundColor: "#280967",
+    borderTopWidth: 1,
+    borderTopColor: "#ffffff",
+  },
+  navButton: {
+    alignItems: "center",
+  },
+  navText: {
+    color: theme.text,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  uploadButton: {
+    backgroundColor: "#FF5722",
+    padding: 10,
+    borderRadius: 20,
+    alignItems: "center",
+    width: 80,
+  },
+  uploadText: {
+    color: "#ffffff",
+    fontSize: 12,
+    marginTop: 2,
+  },
 });
 
 export default SignUpScreen;
->>>>>>> 7f98822 (Added new updates to branch)
